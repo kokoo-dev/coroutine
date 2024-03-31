@@ -3,12 +3,24 @@ package com.kokoo.coroutine
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
 
-class Executor {
+class BasicExecutor {
     companion object {
         private val log = KotlinLogging.logger {}
 
+        fun execute() {
+            doGlobalScope()
+            doRunBlocking()
+
+            runBlocking {
+                doCoroutineScope()
+            }
+
+            join()
+            repeat()
+        }
+
         @OptIn(DelicateCoroutinesApi::class)
-        fun doGlobalScope() {
+        private fun doGlobalScope() {
             // delicate
             GlobalScope.launch {
                 delay(1000)
@@ -20,7 +32,7 @@ class Executor {
             // print: hello world
         }
 
-        fun doRunBlocking() = runBlocking {
+        private fun doRunBlocking() = runBlocking {
             launch {
                 delay(1000)
                 log.info { "world" }
@@ -32,7 +44,7 @@ class Executor {
             // print: hello world, 완료까지 대기
         }
 
-        suspend fun doCoroutineScope() = coroutineScope {
+        private suspend fun doCoroutineScope() = coroutineScope {
             launch {
                 delay(2000)
                 log.info { "world2" }
@@ -48,7 +60,7 @@ class Executor {
             // print: hello world1 world2
         }
 
-        fun doJoin() = runBlocking {
+        private fun join() = runBlocking {
             val job = launch {
                 delay(1000)
                 log.info { "world" }
@@ -61,7 +73,7 @@ class Executor {
             // print: hello world done
         }
 
-        fun doRepeat() = runBlocking {
+        private fun repeat() = runBlocking {
             repeat(50_000) { // launch a lot of coroutines
                 launch {
                     delay(5000L)
