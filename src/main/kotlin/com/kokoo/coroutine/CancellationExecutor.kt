@@ -13,6 +13,8 @@ class CancellationExecutor {
             tryFinally()
             tryFinallyWithNonCancellable()
             isActive()
+            withTimeout()
+            withTimeoutOrNull()
         }
 
         private fun cancelAndJoin() = runBlocking {
@@ -137,6 +139,40 @@ class CancellationExecutor {
             // job: I'm sleeping 2 ...
             // main: I'm tired of waiting!
             // main: Now I can quit.
+        }
+
+        private fun withTimeout() = runBlocking {
+            val result = withTimeout(1300L) {
+                repeat(1000) { i ->
+                    log.info { "job: I'm sleeping $i ..." }
+                    delay(500L)
+                }
+                "Done"
+            }
+            log.info { "main: Result is $result" }
+
+            // print:
+            // job: I'm sleeping 0 ...
+            // job: I'm sleeping 1 ...
+            // job: I'm sleeping 2 ...
+            // Exception in thread "main" kotlinx.coroutines.TimeoutCancellationException: Timed out waiting for 1300 ms
+        }
+
+        private fun withTimeoutOrNull() = runBlocking {
+            val result = withTimeoutOrNull(1300L) {
+                repeat(1000) { i ->
+                    log.info { "job: I'm sleeping $i ..." }
+                    delay(500L)
+                }
+                "Done"
+            }
+            log.info { "main: Result is $result" }
+
+            // print:
+            // job: I'm sleeping 0 ...
+            // job: I'm sleeping 1 ...
+            // job: I'm sleeping 2 ...
+            // main: Result is null
         }
     }
 }
