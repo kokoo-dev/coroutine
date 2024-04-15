@@ -14,6 +14,7 @@ fun main(args: Array<String>) {
 
 	BasicExecutor.execute()
 	CancellationExecutor.execute()
+	ContextDispatcherExecutor.execute()
 
 	log.info { "ended.." }
 }
